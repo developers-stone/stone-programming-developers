@@ -1,0 +1,35 @@
+version: '3.5'
+services:
+    mysql_stone_programming_developers:
+        container_name: mysql_stone_programming_developers
+        image: mysql:latest
+        restart: on-failure
+        environment:
+            MYSQL_DATABASE: stone_programming_developers
+            MYSQL_USER: root
+            MYSQL_PASSWORD: root
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3377:3306
+        volumes:
+          - ./docker/volumes/mysql/data:/var/lib/mysql
+    php_stone_programming_developers:
+        container_name: php_stone_programming_developers
+        build: ./docker/build/php
+        tty: true
+        depends_on:
+            - mysql_stone_programming_developers
+        volumes:
+          - .:/var/www/stone-programming-developers
+    nginx_stone_programming_developers:
+        container_name: nginx_stone_programming_developers
+        image: nginx:latest
+        restart: on-failure
+        ports:
+          - 8877:80
+        volumes:
+          - ./:/var/www/stone-programming-developers
+          - ./docker/build/nginx/default.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+          - php_stone_programming_developers
+          - mysql_stone_programming_developers
